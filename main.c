@@ -7,9 +7,8 @@ char** getAllArgs(char **strArr, int sizeOfArray, int sizeOfString)
 {
   char c;
   int numArgs = 0;
-  char** strArrHold = (char**)malloc(sizeOfArray*sizeof(char));
   char* input = (char*)malloc(sizeOfString*sizeof(char));
-  int i = 0;
+  int charIndex = 0;
   while(c != '\n')
   {
       c = getchar();
@@ -23,13 +22,13 @@ char** getAllArgs(char **strArr, int sizeOfArray, int sizeOfString)
           strArr = (char**)realloc(strArr, sizeOfArray*sizeof(char));
         }
         input = (char*)malloc(sizeOfString*sizeof(char));
-        i = 0;
+        charIndex = 0;
       }
       else
       {
-        input[i] = c;
-        i++;
-        if(i >= sizeOfString)
+        input[charIndex] = c;
+        charIndex++;
+        if(charIndex >= sizeOfString)
         {
           sizeOfString = sizeOfString*2;
           input = (char*)realloc(input, sizeOfString*sizeof(char));
