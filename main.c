@@ -19,7 +19,7 @@ char** getAllArgs(char **strArr, int sizeOfArray, int sizeOfString)
         if(numArgs == sizeOfArray)
         {
           sizeOfArray = sizeOfArray+1;
-          strArr = (char**)realloc(strArr, sizeOfArray*sizeof(char));
+          strArr = (char**)realloc(strArr, sizeOfArray*sizeof(char*));
         }
         input = (char*)malloc(sizeOfString*sizeof(char));
         charIndex = 0;
@@ -41,9 +41,9 @@ char** getAllArgs(char **strArr, int sizeOfArray, int sizeOfString)
 
 int main(int argc, char ** argv)
 {
-  int sizeOfString= 15;
-  int sizeOfArray = 3;
-  char** strArr = (char**)malloc(sizeOfArray*sizeof(char));
+  int sizeOfString= 16;
+  int sizeOfArray = 2;
+  char** strArr = (char**)malloc(sizeOfArray*sizeof(char*));
   strArr = getAllArgs(strArr, sizeOfArray, sizeOfString);
 
   //printf("First command: %s\n", command);
@@ -54,8 +54,8 @@ int main(int argc, char ** argv)
     g++;
   }
 
-  //int retval = execvp(strArr[0], strArr);
-  //printf("retval: %d", retval);
+  int retval = execvp(strArr[0], strArr);
+  printf("retval: %d", retval);
   free(strArr);
   return 0;
 }
