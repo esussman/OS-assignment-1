@@ -56,12 +56,15 @@ char** getAllArgs(char **strArr, int sizeOfArray, int sizeOfString)
       }
       else
       {
-        input[charIndex] = c;
-        charIndex++;
-        if(charIndex >= sizeOfString)
+        if(c != -1)
         {
-          sizeOfString = sizeOfString*2;
-          input = (char*)realloc(input, sizeOfString*sizeof(char));
+          input[charIndex] = c;
+          charIndex++;
+          if(charIndex >= sizeOfString)
+          {
+            sizeOfString = sizeOfString*2;
+            input = (char*)realloc(input, sizeOfString*sizeof(char));
+          }
         }
       }
   }
@@ -73,11 +76,11 @@ int main(int argc, char ** argv)
 {
   int sizeOfString= 16;
   int sizeOfArray = 2;
-  char* * strArr = (char**)malloc(sizeOfArray*sizeof(char*));
   int quit = 0;
 
   while(!quit)
   {
+    char* * strArr = (char**)malloc(sizeOfArray*sizeof(char*));
     printf("CS350sh: ");
     strArr = getAllArgs(strArr, sizeOfArray, sizeOfString);
 
@@ -99,9 +102,10 @@ int main(int argc, char ** argv)
       ampersand = 0;
       quit = 1;
     }
-  }
 
   free(strArr);
+  }
+
   return 0;
 }
 
