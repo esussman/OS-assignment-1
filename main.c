@@ -3,6 +3,36 @@
 #include <stdio.h>
 #include <fcntl.h>
 
+void childProcess(char **strArr)
+{
+  int retval = execvp(strArr[0], strArr);
+}
+
+int does_have(char letter, char **strArr)
+{
+  int i = 0;
+  int exists = 0;
+  while(strArr[i] != NULL)
+  {
+    if(strArr[i][0] == letter)
+    {
+      exists = 1;
+      strArr[i] = (char*)NULL;
+    }
+    i++;
+  }
+
+  return exists;
+}
+
+void parentProcess(int ampersand)
+{
+ if(!ampersand)
+ {
+    wait(NULL);
+ }
+}
+
 char** getAllArgs(char **strArr, int sizeOfArray, int sizeOfString)
 {
   char c;
@@ -43,19 +73,34 @@ int main(int argc, char ** argv)
 {
   int sizeOfString= 16;
   int sizeOfArray = 2;
-  char** strArr = (char**)malloc(sizeOfArray*sizeof(char*));
-  strArr = getAllArgs(strArr, sizeOfArray, sizeOfString);
+  char* * strArr = (char**)malloc(sizeOfArray*sizeof(char*));
+  int quit = 0;
 
-  //printf("First command: %s\n", command);
-  int g=0;
-  while(strArr[g] != NULL)
+  while(!quit)
   {
-    printf("Arg %d: %s\n", g, strArr[g]);
-    g++;
+    printf("CS350sh: ");
+    strArr = getAllArgs(strArr, sizeOfArray, sizeOfString);
+
+    int ampersand = does_have('&', strArr);
+    if(strcmp(strArr[0], "quit") != 0)
+    {
+      int pid = fork();
+      if(pid == 0)
+      {
+        childProcess(strArr);
+      }
+      else
+      {
+        parentProcess(ampersand);
+      }
+    }
+    else
+    {
+      ampersand = 0;
+      quit = 1;
+    }
   }
 
-  int retval = execvp(strArr[0], strArr);
-  printf("retval: %d", retval);
   free(strArr);
   return 0;
 }
