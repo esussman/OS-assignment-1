@@ -25,11 +25,11 @@ int does_have(char letter, char **strArr)
   return exists;
 }
 
-void parentProcess(int ampersand)
+void parentProcess(int pid, int ampersand)
 {
  if(!ampersand)
  {
-    wait(NULL);
+    waitpid(pid, NULL, 0);
  }
 }
 
@@ -94,7 +94,7 @@ int main(int argc, char ** argv)
       }
       else
       {
-        parentProcess(ampersand);
+        parentProcess(pid, ampersand);
       }
     }
     else
