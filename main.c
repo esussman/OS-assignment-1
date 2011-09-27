@@ -7,8 +7,43 @@ void childProcess(char **strArr)
 {
   int retval = execvp(strArr[0], strArr);
 }
+int num_args(char **strArr)
+{
+  int numArgs = 0;
+  while(strArr[numArgs] != NULL)
+  {
+    numArgs++;
+  }
+  return numArgs;
+}
 
-int does_have(char letter, char **strArr)
+int* checkIoOperations(char** strArr, int numArgs, int* retVal)
+{
+  retVal[0] = 0;
+  retVal[1] = 0;
+  int i = 0;
+  for(i = numArgs-1; i >= 0; i--)
+  {
+    if(strcmp(strArr[i], ">") == 0)
+    {
+      strArr[i] = (char*)NULL;
+      int outputFile = open(strArr[i+1], O_CREAT | O_WRONLY, 0666);
+      retVal[0] = outputFile;
+      if(outputFile < 0)
+        retVal[0] = -1;
+      if(dup2(outputFile, 1) < 0)
+        retVal[0] = -1;
+      strArr[i+1] = (char*)NULL;
+    }
+    else if(strcmp(strArr[i], "<") == 0)
+    {
+
+    }
+  }
+  return retVal;
+}
+
+int does_have(char letter, char **strArr, int numArgs)
 {
   int i = 0;
   int exists = 0;
@@ -80,17 +115,22 @@ int main(int argc, char ** argv)
 
   while(!quit)
   {
+
     char* * strArr = (char**)malloc(sizeOfArray*sizeof(char*));
+    int* retVal = (int*)malloc(2*sizeof(int));
     printf("CS350sh: ");
     strArr = getAllArgs(strArr, sizeOfArray, sizeOfString);
-
-    int ampersand = does_have('&', strArr);
+    int numArgs = num_args(strArr);
+    int ampersand = does_have('&', strArr, numArgs);
     if(strcmp(strArr[0], "quit") != 0)
     {
       int pid = fork();
       if(pid == 0)
       {
+        retVal = checkIoOperations(strArr, numArgs, retVal);
         childProcess(strArr);
+        if(retVal[0] != -1)
+          close(retVal[0]);
       }
       else
       {
@@ -102,8 +142,8 @@ int main(int argc, char ** argv)
       ampersand = 0;
       quit = 1;
     }
-
   free(strArr);
+  free(retVal);
   }
 
   return 0;
