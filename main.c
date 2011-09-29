@@ -37,7 +37,12 @@ int* checkIoOperations(char** strArr, int numArgs, int* retVal)
     }
     else if(strcmp(strArr[i], "<") == 0)
     {
-
+      strArr[i] =  (char*)NULL;
+      int inputFile = open(strArr[i+1], O_RDONLY, 0666);
+      retVal[1] = inputFile;
+      if(inputFile < 0)
+        retVal[1] = -1;
+      strArr[i+1] = (char*)NULL;
     }
   }
   return retVal;
