@@ -3,9 +3,35 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-void childProcess(char **strArr)
+void childProcess(char **strArr, int* ioVal)
 {
-  int retval = execvp(strArr[0], strArr);
+  if(ioVal[1] > 0)
+  {
+    int pipeArr[2];
+    pipe(pipeArr);
+    int pid = fork();
+    if(pid == 0)
+    {
+      close(pipeArr[0]);
+      int sizeOfString = 100;
+      char* input = (char*)malloc(sizeOfString*sizeof(char));
+      int ret = read(ioVal[1], input, sizeOfString);
+      write(pipeArr[1], input, sizeOfString);
+      exit(0);
+    }
+    else
+    {
+      dup2(pipeArr[0], 0);
+      close(pipeArr[1]);
+      //ALways will wait for now
+      waitpid(pid, NULL, 0);
+      int retval = execvp(strArr[0], strArr);
+    }
+  }
+  else
+  {
+    int retval = execvp(strArr[0], strArr);
+  }
 }
 int num_args(char **strArr)
 {
@@ -133,9 +159,13 @@ int main(int argc, char ** argv)
       if(pid == 0)
       {
         retVal = checkIoOperations(strArr, numArgs, retVal);
-        childProcess(strArr);
+        childProcess(strArr, retVal);
         if(retVal[0] != -1)
           close(retVal[0]);
+        if(retVal[1] != 0)
+        {
+          close(retVal[1]);
+        }
       }
       else
       {
