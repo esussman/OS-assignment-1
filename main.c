@@ -43,7 +43,7 @@ int* checkIoOperations(char** strArr, int numArgs, int* retVal)
   return retVal;
 }
 
-int does_have(char letter, char **strArr, int numArgs)
+int does_have(char letter, char **strArr)
 {
   int i = 0;
   int exists = 0;
@@ -79,6 +79,7 @@ char** getAllArgs(char **strArr, int sizeOfArray, int sizeOfString)
       c = getchar();
       if(c == ' ' || c == '\n')
       {
+        input[charIndex] = '\0';
         strArr[numArgs] = input;
         numArgs++;
         if(numArgs == sizeOfArray)
@@ -95,7 +96,7 @@ char** getAllArgs(char **strArr, int sizeOfArray, int sizeOfString)
         {
           input[charIndex] = c;
           charIndex++;
-          if(charIndex >= sizeOfString)
+          if(charIndex+1 == sizeOfString)
           {
             sizeOfString = sizeOfString*2;
             input = (char*)realloc(input, sizeOfString*sizeof(char));
@@ -115,13 +116,12 @@ int main(int argc, char ** argv)
 
   while(!quit)
   {
-
     char* * strArr = (char**)malloc(sizeOfArray*sizeof(char*));
     int* retVal = (int*)malloc(2*sizeof(int));
     printf("CS350sh: ");
     strArr = getAllArgs(strArr, sizeOfArray, sizeOfString);
     int numArgs = num_args(strArr);
-    int ampersand = does_have('&', strArr, numArgs);
+    int ampersand = does_have('&', strArr);
     if(strcmp(strArr[0], "quit") != 0)
     {
       int pid = fork();
