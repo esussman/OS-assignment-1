@@ -8,29 +8,45 @@ void childProcess(char **strArr, int* ioVal)
   if(ioVal[1] > 0)
   {
     int pipeArr[2];
-    pipe(pipeArr);
+    if(pipe(pipeArr) < 0)
+      exit(1);
     int pid = fork();
+    if(pid < 0)
+      exit(1);
     if(pid == 0)
     {
       close(pipeArr[0]);
       int sizeOfString = 100;
       char* input = (char*)malloc(sizeOfString*sizeof(char));
       int ret = read(ioVal[1], input, sizeOfString);
-      write(pipeArr[1], input, sizeOfString);
+      if(ret < 0)
+        exit(1);
+      if(write(pipeArr[1], input, sizeOfString) < 0)
+        exit(1);
+
       exit(0);
     }
     else
     {
-      dup2(pipeArr[0], 0);
+      if(dup2(pipeArr[0], 0) < 0)
+        exit(1);
       close(pipeArr[1]);
       //ALways will wait for now
       waitpid(pid, NULL, 0);
       int retval = execvp(strArr[0], strArr);
+      if(retval<0)
+        exit(1);
+
+      exit(0);
     }
   }
   else
   {
     int retval = execvp(strArr[0], strArr);
+    if(retval < 0)
+      exit(1);
+
+    exit(0);
   }
 }
 int num_args(char **strArr)
@@ -56,15 +72,24 @@ int* checkIoOperations(char** strArr, int numArgs, int* retVal)
       int outputFile = open(strArr[i+1], O_CREAT | O_WRONLY, 0666);
       retVal[0] = outputFile;
       if(outputFile < 0)
+      {
         retVal[0] = -1;
+        exit(1);
+      }
       if(dup2(outputFile, 1) < 0)
+      {
         retVal[0] = -1;
+        exit(1);
+      }
       strArr[i+1] = (char*)NULL;
     }
     else if(strcmp(strArr[i], "<") == 0)
     {
       strArr[i] =  (char*)NULL;
       int inputFile = open(strArr[i+1], O_RDONLY, 0666);
+      if(inputFile < 0)
+        exit(1);
+
       retVal[1] = inputFile;
       if(inputFile < 0)
         retVal[1] = -1;
