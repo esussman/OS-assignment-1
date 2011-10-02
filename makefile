@@ -9,4 +9,4 @@ main.o: main.c
 	$(CC) -c main.c
 	
 clean:
-	rm -f *.txt cs350sh
+	rm -f *.o *.txt cs350sh
