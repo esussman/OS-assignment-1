@@ -1,8 +1,12 @@
-all: main.o
-	gcc -o exec -Wall -g main.o
+CC=gcc -Wall -g
+
+all: cs350sh
+
+cs350sh: main.o
+	$(CC) -o cs350sh main.o
 	
 main.o: main.c
-	gcc -c -g main.c
+	$(CC) -c main.c
 	
 clean:
-	rm -f *.o *.txt exec
+	rm -f *.txt cs350sh
