@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-void childProcess(char **strArr, int* ioVal, int amp)
+void childProcess(char **strArr, int* ioVal)
 {
   if(ioVal[1] > 0)
   {
@@ -32,10 +32,7 @@ void childProcess(char **strArr, int* ioVal, int amp)
         exit(1);
       close(pipeArr[1]);
       //ALways will wait for now
-      if(!amp)
-      {
-        waitpid(pid, NULL, 0);
-      }
+      waitpid(pid, NULL, 0);
       int retval = execvp(strArr[0], strArr);
       if(retval<0)
         exit(1);
@@ -179,21 +176,19 @@ int main(int argc, char ** argv)
     int* retVal = (int*)malloc(2*sizeof(int));
     printf("CS350sh: ");
     strArr = getAllArgs(strArr, sizeOfArray, sizeOfString);
-    int numArgs = num_args(strArr);
     int ampersand = does_have('&', strArr);
+    int numArgs = num_args(strArr);
     if(strcmp(strArr[0], "quit") != 0)
     {
       int pid = fork();
       if(pid == 0)
       {
         retVal = checkIoOperations(strArr, numArgs, retVal);
-        childProcess(strArr, retVal, ampersand);
+        childProcess(strArr, retVal);
         if(retVal[0] != -1)
           close(retVal[0]);
         if(retVal[1] != 0)
-        {
           close(retVal[1]);
-        }
       }
       else
       {
