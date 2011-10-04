@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-void childProcess(char **strArr, int* ioVal)
+void childProcess(char **strArr, int* ioVal, int amp)
 {
   if(ioVal[1] > 0)
   {
@@ -32,7 +32,10 @@ void childProcess(char **strArr, int* ioVal)
         exit(1);
       close(pipeArr[1]);
       //ALways will wait for now
-      waitpid(pid, NULL, 0);
+      if(!amp)
+      {
+        waitpid(pid, NULL, 0);
+      }
       int retval = execvp(strArr[0], strArr);
       if(retval<0)
         exit(1);
@@ -184,7 +187,7 @@ int main(int argc, char ** argv)
       if(pid == 0)
       {
         retVal = checkIoOperations(strArr, numArgs, retVal);
-        childProcess(strArr, retVal);
+        childProcess(strArr, retVal, ampersand);
         if(retVal[0] != -1)
           close(retVal[0]);
         if(retVal[1] != 0)
